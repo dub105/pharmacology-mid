@@ -441,18 +441,18 @@ function MCQCard({q,idx,onAnswer,answered}){
 
 function FillCard({q,idx,onAnswer,answered}){
   const [input,setInput]=useState("");
-  const [submitted,setSubmitted]=useState(false);
-  const submit=()=>{if(!input.trim())return;setSubmitted(true);onAnswer(true);};
+  useEffect(()=>{setInput("");},[idx]);
+  const submit=()=>{if(!input.trim()||answered)return;onAnswer(true);};
   const parts=(q.question||"").split("【　】");
   return(
-    <div style={{background:C.surf2,border:`1px solid ${submitted?"rgba(167,139,250,0.4)":C.border}`,borderRadius:12,padding:"20px 22px",marginBottom:16}}>
+    <div style={{background:C.surf2,border:`1px solid ${answered?"rgba(167,139,250,0.4)":C.border}`,borderRadius:12,padding:"20px 22px",marginBottom:16}}>
       <div style={{marginBottom:12}}><Tag color={C.purple}>穴埋め Q{idx+1}</Tag></div>
       <div style={{fontSize:14,fontWeight:600,lineHeight:1.9,marginBottom:18}}>
         {parts.map((part,i)=>(
-          <span key={i}>{part}{i<parts.length-1&&<span style={{display:"inline-block",background:"rgba(167,139,250,0.15)",border:`1px solid ${C.purple}44`,borderRadius:4,padding:"0 20px",marginInline:4,color:submitted?C.purple:"transparent",fontWeight:700,minWidth:60,textAlign:"center"}}>{submitted?q.answer:"　　　"}</span>}</span>
+          <span key={i}>{part}{i<parts.length-1&&<span style={{display:"inline-block",background:"rgba(167,139,250,0.15)",border:`1px solid ${C.purple}44`,borderRadius:4,padding:"0 20px",marginInline:4,color:answered?C.purple:"transparent",fontWeight:700,minWidth:60,textAlign:"center"}}>{answered?q.answer:"　　　"}</span>}</span>
         ))}
       </div>
-      {!submitted?(
+      {!answered?(
         <div style={{display:"flex",gap:10}}>
           <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submit()} placeholder="答えを入力してEnter" style={{flex:1,padding:"10px 14px",background:C.surf3,border:`1px solid ${C.border2}`,borderRadius:8,color:C.text,fontFamily:"'Noto Sans JP',sans-serif",fontSize:13,outline:"none"}}/>
           <Btn variant="purple" onClick={submit} disabled={!input.trim()}>確認</Btn>
@@ -473,6 +473,7 @@ function FillCard({q,idx,onAnswer,answered}){
 function EssayCard({q,idx,onAnswer,answered:_answered}){
   const [show,setShow]=useState(false);
   const [score,setScore]=useState(null);
+  useEffect(()=>{setShow(false);setScore(null);},[idx]);
   return(
     <div style={{background:C.surf2,border:`1px solid ${score?(score==="ok"?"rgba(74,222,128,0.4)":"rgba(251,191,36,0.4)"):C.border}`,borderRadius:12,padding:"20px 22px",marginBottom:16}}>
       <div style={{marginBottom:12}}><Tag color={C.yellow}>記述式 Q{idx+1}</Tag></div>
