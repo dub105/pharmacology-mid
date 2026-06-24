@@ -439,14 +439,17 @@ function MCQCard({q,idx,onAnswer,answered}){
   );
 }
 
-function FillCard({q,idx,onAnswer,answered}){
+function FillCard({q,idx,onAnswer,answered,onCorrectOverride}){
   const [input,setInput]=useState("");
-  useEffect(()=>{setInput("");},[idx]);
+  const [overridden,setOverridden]=useState(false);
+  useEffect(()=>{setInput("");setOverridden(false);},[idx]);
   const isCorrect=input.trim()===q.answer.trim();
+  const effective=isCorrect||overridden;
   const submit=()=>{if(!input.trim()||answered)return;onAnswer(isCorrect);};
+  const handleOverride=()=>{setOverridden(true);onCorrectOverride();};
   const parts=(q.question||"").split("【　】");
   return(
-    <div style={{background:C.surf2,border:`1px solid ${answered?(isCorrect?"rgba(74,222,128,0.4)":"rgba(248,113,113,0.4)"):C.border}`,borderRadius:12,padding:"20px 22px",marginBottom:16}}>
+    <div style={{background:C.surf2,border:`1px solid ${answered?(effective?"rgba(74,222,128,0.4)":"rgba(248,113,113,0.4)"):C.border}`,borderRadius:12,padding:"20px 22px",marginBottom:16}}>
       <div style={{marginBottom:12}}><Tag color={C.purple}>穴埋め Q{idx+1}</Tag></div>
       <div style={{fontSize:14,fontWeight:600,lineHeight:1.9,marginBottom:18}}>
         {parts.map((part,i)=>(
@@ -462,10 +465,16 @@ function FillCard({q,idx,onAnswer,answered}){
         <div>
           <div style={{fontSize:13,marginBottom:10}}>
             <span style={{color:C.sub}}>あなたの回答：</span>
-            <span style={{fontWeight:700,color:isCorrect?C.green:C.red}}>{input}</span>
-            <span style={{marginLeft:8,fontWeight:700,color:isCorrect?C.green:"inherit"}}>{isCorrect?"✓ 正解":"✗"}</span>
-            {!isCorrect&&<span style={{marginLeft:12,color:C.purple,fontWeight:700}}>正解：{q.answer}</span>}
+            <span style={{fontWeight:700,color:effective?C.green:C.red}}>{input}</span>
+            <span style={{marginLeft:8,fontWeight:700,color:effective?C.green:"inherit"}}>{effective?"✓ 正解":"✗"}</span>
+            {!isCorrect&&!overridden&&<span style={{marginLeft:12,color:C.purple,fontWeight:700}}>正解：{q.answer}</span>}
+            {overridden&&<span style={{marginLeft:8,fontSize:11,color:C.green,opacity:0.8}}>（手動正解）</span>}
           </div>
+          {!isCorrect&&!overridden&&(
+            <div style={{marginBottom:10}}>
+              <Btn variant="ghost" size="sm" onClick={handleOverride}>✓ 正解として扱う</Btn>
+            </div>
+          )}
           {q.explanation&&<div style={{padding:"12px 15px",background:"rgba(167,139,250,0.07)",borderRadius:8,border:"1px solid rgba(167,139,250,0.2)",fontSize:12,color:C.dim,lineHeight:1.75}}><span style={{fontWeight:700,color:C.purple}}>解説 </span>{q.explanation}</div>}
         </div>
       )}
@@ -590,6 +599,10 @@ export default function App(){
   const handleAnswer=useCallback(correct=>{
     setResults(prev=>[...prev,correct]);
     setAnswered(true);
+  },[]);
+
+  const overrideLastResult=useCallback(()=>{
+    setResults(prev=>prev.length?[...prev.slice(0,-1),true]:prev);
   },[]);
 
   const next=()=>{
@@ -767,7 +780,7 @@ export default function App(){
         </div>
         {q&&(
           q.type==="mcq"?<MCQCard key={current} q={q} idx={current} onAnswer={handleAnswer} answered={answered}/>:
-          q.type==="fill"?<FillCard key={current} q={q} idx={current} onAnswer={handleAnswer} answered={answered}/>:
+          q.type==="fill"?<FillCard key={current} q={q} idx={current} onAnswer={handleAnswer} answered={answered} onCorrectOverride={overrideLastResult}/>:
           q.type==="essay"?<EssayCard key={current} q={q} idx={current} onAnswer={handleAnswer} answered={answered}/>:null
         )}
         {answered&&<div style={{display:"flex",justifyContent:"flex-end",marginTop:8}}><Btn variant="accent" size="lg" onClick={next}>{current+1>=questions.length?"結果を見る →":"次の問題 →"}</Btn></div>}
