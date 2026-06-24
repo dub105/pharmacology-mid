@@ -503,9 +503,9 @@ function EssayCard({q,idx,onAnswer}){
 // ── メインアプリ ──────────────────────────────────────────────
 export default function App(){
   const [screen,setScreen]=useState("home");
-  const [section,setSection]=useState(()=>localStorage.getItem("pq_section")||"all");
+  const [section,setSection]=useState(()=>{try{return localStorage.getItem("pq_section")||"all";}catch{return "all";}});
   const [qTypes,setQTypes]=useState(()=>{try{const v=localStorage.getItem("pq_qtypes");return v?JSON.parse(v):["mcq","fill","essay"];}catch{return ["mcq","fill","essay"];}});
-  const [qCount,setQCount]=useState(()=>{const n=parseInt(localStorage.getItem("pq_qcount")||"10",10);return [5,10,15,20].includes(n)?n:10;});
+  const [qCount,setQCount]=useState(()=>{try{const n=parseInt(localStorage.getItem("pq_qcount")||"10",10);return [5,10,15,20].includes(n)?n:10;}catch{return 10;}});
   const [questions,setQuestions]=useState([]);
   const [results,setResults]=useState([]);
   const [current,setCurrent]=useState(0);
