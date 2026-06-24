@@ -762,9 +762,9 @@ export default function App(){
           <span style={{fontSize:12,fontFamily:"monospace",color:C.sub}}>{current+1}/{questions.length}</span>
         </div>
         {q&&(
-          q.type==="mcq"?<MCQCard q={q} idx={current} onAnswer={handleAnswer} answered={answered}/>:
-          q.type==="fill"?<FillCard q={q} idx={current} onAnswer={handleAnswer} answered={answered}/>:
-          q.type==="essay"?<EssayCard q={q} idx={current} onAnswer={handleAnswer} answered={answered}/>:null
+          q.type==="mcq"?<MCQCard key={current} q={q} idx={current} onAnswer={handleAnswer} answered={answered}/>:
+          q.type==="fill"?<FillCard key={current} q={q} idx={current} onAnswer={handleAnswer} answered={answered}/>:
+          q.type==="essay"?<EssayCard key={current} q={q} idx={current} onAnswer={handleAnswer} answered={answered}/>:null
         )}
         {answered&&<div style={{display:"flex",justifyContent:"flex-end",marginTop:8}}><Btn variant="accent" size="lg" onClick={next}>{current+1>=questions.length?"結果を見る →":"次の問題 →"}</Btn></div>}
       </div>
