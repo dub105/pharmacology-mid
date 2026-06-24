@@ -442,10 +442,11 @@ function MCQCard({q,idx,onAnswer,answered}){
 function FillCard({q,idx,onAnswer,answered}){
   const [input,setInput]=useState("");
   useEffect(()=>{setInput("");},[idx]);
-  const submit=()=>{if(!input.trim()||answered)return;onAnswer(true);};
+  const isCorrect=input.trim()===q.answer.trim();
+  const submit=()=>{if(!input.trim()||answered)return;onAnswer(isCorrect);};
   const parts=(q.question||"").split("【　】");
   return(
-    <div style={{background:C.surf2,border:`1px solid ${answered?"rgba(167,139,250,0.4)":C.border}`,borderRadius:12,padding:"20px 22px",marginBottom:16}}>
+    <div style={{background:C.surf2,border:`1px solid ${answered?(isCorrect?"rgba(74,222,128,0.4)":"rgba(248,113,113,0.4)"):C.border}`,borderRadius:12,padding:"20px 22px",marginBottom:16}}>
       <div style={{marginBottom:12}}><Tag color={C.purple}>穴埋め Q{idx+1}</Tag></div>
       <div style={{fontSize:14,fontWeight:600,lineHeight:1.9,marginBottom:18}}>
         {parts.map((part,i)=>(
@@ -460,8 +461,10 @@ function FillCard({q,idx,onAnswer,answered}){
       ):(
         <div>
           <div style={{fontSize:13,marginBottom:10}}>
-            <span style={{color:C.sub}}>あなたの回答：</span><span style={{fontWeight:700}}>{input}</span>
-            <span style={{marginLeft:12,color:C.purple,fontWeight:700}}>正解：{q.answer}</span>
+            <span style={{color:C.sub}}>あなたの回答：</span>
+            <span style={{fontWeight:700,color:isCorrect?C.green:C.red}}>{input}</span>
+            <span style={{marginLeft:8,fontWeight:700,color:isCorrect?C.green:"inherit"}}>{isCorrect?"✓ 正解":"✗"}</span>
+            {!isCorrect&&<span style={{marginLeft:12,color:C.purple,fontWeight:700}}>正解：{q.answer}</span>}
           </div>
           {q.explanation&&<div style={{padding:"12px 15px",background:"rgba(167,139,250,0.07)",borderRadius:8,border:"1px solid rgba(167,139,250,0.2)",fontSize:12,color:C.dim,lineHeight:1.75}}><span style={{fontWeight:700,color:C.purple}}>解説 </span>{q.explanation}</div>}
         </div>
