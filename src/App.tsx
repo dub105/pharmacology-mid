@@ -470,7 +470,7 @@ function FillCard({q,idx,onAnswer,answered}){
   );
 }
 
-function EssayCard({q,idx,onAnswer}){
+function EssayCard({q,idx,onAnswer,answered:_answered}){
   const [show,setShow]=useState(false);
   const [score,setScore]=useState(null);
   return(
